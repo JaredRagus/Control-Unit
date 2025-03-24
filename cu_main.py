@@ -5,18 +5,21 @@ import sys
 import RPi.GPIO as GPIO
 from paho import mqtt
 import json
+import subprocess
 
 # Initialize variables
 toggle = False
 connection_status = False
 new_data = False
 user_input = False
+sensor = 0
 Sensor_1 = False
 Sensor_2 = False
 Sensor_3 = False
 received = False
 vent = False
 data = {}
+IAQ = 0 #UI Variable
 IAQ_PM2 = 0
 IAQ_PM10 = 0
 IAQ_ovr = 0
@@ -24,6 +27,8 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.setup(16,GPIO.OUT, initial = False)                  
 GPIO.setup(18,GPIO.OUT, initial = False)
+# Need a new variable for sensor id
+UI_command = ["alarms","/home/freshair/Documents/PM_Device/Alarms.py",IAQ,sensor]
 
 # Raw data from sensors comes in the following format:
 # {"iaqi_pm2.5":12,"iaqi_pm10":2,"overall_iaqi":12}
@@ -145,21 +150,16 @@ while connection_status == True:
     # If sensor data is parsed:   
     if new_data:
         time.sleep(0.5)
-        
-        # Publish individual values to broker
-        client.publish("cu/IAQ_PM2.5", payload=IAQ_PM2, qos=0)
-        client.publish("cu/IAQ_PM10", payload=IAQ_PM10, qos=0)
-        client.publish("cu/IAQ_ovr", payload=IAQ_ovr, qos=0)
-        
+                
         # If over/equal to conditions below, "Dangerous" PM condition met (via OSHA 1910.1000)
         if IAQ_PM2 >= 55 or IAQ_PM10 >= 255 or IAQ_ovr >=255:
             client.publish("cu/pm_status", payload="Dangerous", qos=0)
             time.sleep(0.5)
-            GPIO.output(18, True)
-            time.sleep(0.5)
+            IAQ = 3
             client.publish("cu/vent", payload=True, qos=0)
             print("Ventilation Status: ON")
-            print("Siren Status: RED")
+            time.sleep(0.5)
+            process = subprocess.run(UI_command, capture_output=True, text=true)
             time.sleep(5)
             new_data = False
             
@@ -167,8 +167,9 @@ while connection_status == True:
         elif IAQ_PM2 >= 35 or IAQ_PM10 >= 155 or IAQ_ovr >=155:
             client.publish("cu/pm_status", payload="Unhealthy", qos=0)
             print("Siren Status: YELLOW")
+            IAQ = 2
             time.sleep(0.5)
-            GPIO.output(16, True)
+            process = subprocess.run(UI_command, capture_output=True, text=true)
             time.sleep(5)
             new_data = False
             
@@ -176,10 +177,9 @@ while connection_status == True:
         else:
             client.publish("cu/pm_status", payload="Healthy", qos=0)
             client.publish("cu/vent", payload=False, qos=0)
-            GPIO.output(18, False)
+            IAQ = 1
             time.sleep(0.5)
-            GPIO.output(16, False)
-            time.sleep(0.5)
+            process = subprocess.run(UI_command, capture_output=True, text=true)
             time.sleep(5)
             print("Ventilation Status: OFF")
             print("Siren Status: OFF")
