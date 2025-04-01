@@ -16,6 +16,8 @@ sensor = 0
 Sensor_1 = False
 Sensor_2 = False
 Sensor_3 = False
+Sensor_4 = False
+sensor_id = ""
 received = False
 vent = False
 data = {}
@@ -64,6 +66,8 @@ def on_message(client, userdata, msg):
     global Sensor_1
     global Sensor_2
     global Sensor_3
+    global Sensor_4
+    global sensor_id
     
     # If message from Toggle, button was pressed, set to true
     if "Toggle" in msg.topic:
@@ -92,10 +96,16 @@ def on_message(client, userdata, msg):
     # Determine sensor ID
     if "Sensor1" in msg.topic:
         Sensor_1 = True
+        sensor_id = "1"
     if "Sensor2" in msg.topic:
         Sensor_2 = True
+        sensor_id = "2"
     if "Sensor3" in msg.topic:
         Sensor_3 = True
+        sensor_id = "3"
+    if "Sensor4" in msg.topic:
+        Sensor_4 = True
+        sensor_id = "4"
      
 # MQTT Initialization
 client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
@@ -155,11 +165,12 @@ while connection_status == True:
         if IAQ_PM2 >= 55 or IAQ_PM10 >= 255 or IAQ_ovr >=255:
             client.publish("cu/pm_status", payload="Dangerous", qos=0)
             time.sleep(0.5)
-            IAQ = 3
+            IAQ = "3"
+            IAQ += sensor_id
             client.publish("cu/vent", payload=True, qos=0)
             print("Ventilation Status: ON")
             time.sleep(0.5)
-            process = subprocess.run(UI_command, capture_output=True, text=true)
+            subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main.py', IAQ] ,text=True, timeout=1)
             time.sleep(5)
             new_data = False
             
@@ -167,9 +178,10 @@ while connection_status == True:
         elif IAQ_PM2 >= 35 or IAQ_PM10 >= 155 or IAQ_ovr >=155:
             client.publish("cu/pm_status", payload="Unhealthy", qos=0)
             print("Siren Status: YELLOW")
-            IAQ = 2
+            IAQ = "2"
+            IAQ += sensor_id
             time.sleep(0.5)
-            process = subprocess.run(UI_command, capture_output=True, text=true)
+            subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main.py', IAQ] ,text=True, timeout=1)
             time.sleep(5)
             new_data = False
             
@@ -177,9 +189,10 @@ while connection_status == True:
         else:
             client.publish("cu/pm_status", payload="Healthy", qos=0)
             client.publish("cu/vent", payload=False, qos=0)
-            IAQ = 1
+            IAQ = "1"
+            IAQ += sensor_id
             time.sleep(0.5)
-            process = subprocess.run(UI_command, capture_output=True, text=true)
+            subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main.py', IAQ] ,text=True, timeout=1)
             time.sleep(5)
             print("Ventilation Status: OFF")
             print("Siren Status: OFF")
