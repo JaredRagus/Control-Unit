@@ -111,8 +111,8 @@ def on_message(client, userdata, msg):
 client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
 client.on_connect = on_connect
 client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
-client.username_pw_set("freshair", "Freshair1")
-client.connect("307235db588f42bda5a2c31d242ef05c.s1.eu.hivemq.cloud", 8883)
+client.username_pw_set("freshair", "freshair")
+client.connect("mqtt://155.225.212.205:1883", 1883)
 client.on_subscribe = on_subscribe
 client.on_message = on_message
 client.on_publish = on_publish
@@ -163,7 +163,7 @@ while connection_status == True:
                 
         # If over/equal to conditions below, "Dangerous" PM condition met (via OSHA 1910.1000)
         if IAQ_PM2 >= 55 or IAQ_PM10 >= 255 or IAQ_ovr >=255:
-            client.publish("cu/pm_status", payload="Dangerous", qos=0)
+            client.publish("ESP32/Control", payload="ON", qos=0)
             time.sleep(0.5)
             IAQ = "3"
             IAQ += sensor_id
@@ -187,8 +187,7 @@ while connection_status == True:
             
         # If below both conditions, "Healthy" PM condition met (via OSHA 1910.1000)
         else:
-            client.publish("cu/pm_status", payload="Healthy", qos=0)
-            client.publish("cu/vent", payload=False, qos=0)
+            client.publish("ESP32/Control", payload="OFF", qos=0)
             IAQ = "1"
             IAQ += sensor_id
             time.sleep(0.5)
