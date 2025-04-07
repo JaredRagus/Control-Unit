@@ -1,3 +1,18 @@
+# File Name:         cu_main.py
+# Contributors:      David Kunz
+#                    Chris Sparano
+# Last Contribution: 13:58; 4/7/25
+# Purpose:           Fresh Air Senior Design Project
+# Project Name:      Particulate Matter Detection and Alert System for 
+#                    Citadel Civil Engineering Concrete and Asphalt Lab
+#
+# NOTES:
+# Data from sensors via the ESP32 devices comes in the following format:
+# {"SensorID":%s,"PM2.5 ug/m^3":%.1f,"PM10 ug/m^3":%.1f,"IAQI_PM2.5":%d,"IAQI_PM10":%d,"Overall_IAQI":%d}
+#
+# Numeric values between ":" and "," characters will change
+# depending on real time data
+
 # Initialize libraries
 import time
 import paho.mqtt.client as paho
@@ -10,7 +25,8 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
 sensor_data_file = '/home/freshair/sensor_data.txt'
-# Initialize variables
+
+# Initialize variables and GPIO
 toggle = False
 connection_status = False
 new_data = False
@@ -23,13 +39,8 @@ IAQ = 0 #UI Variable
 IAQ_PM2 = 0
 IAQ_PM10 = 0
 IAQ_ovr = 0
-# GPIO.setmode(GPIO.BOARD)
-# GPIO.setwarnings(False)
-# GPIO.setup(16,GPIO.OUT, initial = False)                  
-# GPIO.setup(18,GPIO.OUT, initial = False)
 GPIO.setup(37, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-# Need a new variable for sensor id
-UI_command = ["alarms","/home/freshair/Documents/PM_Device/Alarms.py",IAQ,sensor_id]
+
 def reset_sensors():
     # Erase the sensor_id file if it exists
     if os.path.exists(sensor_data_file):
@@ -43,10 +54,6 @@ def reset_sensors():
     sensor_3 = 1
     sensor_4 = 1
     print("All sensor values initialized to 1.")
-# Raw data from sensors comes in the following format:
-# {"iaqi_pm2.5":12,"iaqi_pm10":2,"overall_iaqi":12}
-# NOTE: Numeric values between ":" and "," characters will change
-# depending on real time data
 
 # Upon connection, print connection status and set global variable
 def on_connect(client, userdata, flags, rc, properties=None):
@@ -223,6 +230,9 @@ def button_callback(channel):
     
 GPIO.add_event_detect(37,GPIO.RISING,callback=button_callback)
 reset_sensors()
+GPIO.cleanup()
+client.loop_stop()
+sys.exit()
 GPIO.cleanup()
 client.loop_stop()
 sys.exit()
