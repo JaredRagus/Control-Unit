@@ -202,7 +202,7 @@ while connection_status == True:
             print("Healthy")
             #IAQ += sensor_id
             time.sleep(0.5)
-            subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main.py', IAQ, sensor_id] ,text=True, timeout=3)
+            subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main_Copy.py', IAQ, sensor_id] ,text=True, timeout=3)
             time.sleep(0.5)
             toggle = True
             new_data = False
@@ -218,7 +218,7 @@ while connection_status == True:
             prev_4 = IAQ
             
 def button_callback(channel):
-    GPIO.output(18,False)
+    GPIO.output(18, False)
     GPIO.output(16, False)
     
 GPIO.add_event_detect(37,GPIO.RISING,callback=button_callback)
