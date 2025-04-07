@@ -144,6 +144,15 @@ while connection_status == True:
         new_data = True
         
         # Handle ventilation status
+        if IAQ_ovr >=200 and (prev_1 and prev_2 and prev_3 and prev_4) != "3":
+            client.publish("ESP32/Relay", payload="ON", qos=0)
+            vent = True
+        elif IAQ_ovr <100 and (prev_1 and prev_2 and prev_3 and prev_4) != "1":
+            client.publish("ESP32/Relay", payload="OFF", qos=0)
+            vent = False
+        else:
+            pass
+            
         if vent == True:
             client.publish("cu/vent", payload=True, qos=0)
             print("Ventilation Status: ON")
@@ -197,6 +206,16 @@ while connection_status == True:
             time.sleep(0.5)
             toggle = True
             new_data = False
+
+        # Keep track of previous status of PM for each sensor
+        if sensor_id == "1":
+            prev_1 = IAQ
+        if sensor_id == "2":
+            prev_2 = IAQ
+        if sensor_id == "3":
+            prev_3 = IAQ
+        if sensor_id == "4":
+            prev_4 = IAQ
             
 def button_callback(channel):
     GPIO.output(18,False)
