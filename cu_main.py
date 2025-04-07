@@ -1,7 +1,7 @@
 # File Name:         cu_main.py
 # Contributors:      David Kunz
 #                    Chris Sparano
-# Last Contribution: 14:43; 4/7/25
+# Last Contribution: 15:00; 4/7/25
 # Purpose:           Fresh Air Senior Design Project
 # Project Name:      Particulate Matter Detection and Alert System for 
 #                    Citadel Civil Engineering Concrete and Asphalt Lab
@@ -39,6 +39,10 @@ IAQ = 0 #UI Variable
 IAQ_PM2 = 0
 IAQ_PM10 = 0
 IAQ_ovr = 0
+prev_1 = ""
+prev_2 = ""
+prev_3 = ""
+prev_4 = ""
 GPIO.setup(37, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def reset_sensors():
