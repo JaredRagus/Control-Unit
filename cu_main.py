@@ -10,7 +10,7 @@
 # Data from sensors via the ESP32 devices comes in the following format:
 # {"SensorID":%s,"PM2.5 ug/m^3":%.1f,"PM10 ug/m^3":%.1f,"IAQI_PM2.5":%d,"IAQI_PM10":%d,"Overall_IAQI":%d}
 #
-# Numeric values between ":" and "," characters will change
+# Values between ":" and "," characters will change
 # depending on real time data
 
 # Initialize libraries
