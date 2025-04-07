@@ -1,7 +1,7 @@
 # File Name:         cu_main.py
 # Contributors:      David Kunz
 #                    Chris Sparano
-# Last Contribution: 15:00; 4/7/25
+# Last Contribution: 15:15; 4/7/25
 # Purpose:           Fresh Air Senior Design Project
 # Project Name:      Particulate Matter Detection and Alert System for 
 #                    Citadel Civil Engineering Concrete and Asphalt Lab
@@ -146,12 +146,12 @@ while connection_status == True:
         IAQ_PM2 = data.get("IAQI_PM2.5", 0)  # Default to 0 if IAQI_PM2.5 is missing
         IAQ_PM10 = data.get("IAQI_PM10", 0)  # Default to 0 if IAQI_PM10 is missing
         IAQ_ovr = data.get("Overall_IAQI", 0)  # Default to 0 if Overall_IAQI is missing
-        print(f"Sensor ID: {sensor_id}")
+#         print(f"Sensor ID: {sensor_id}")
 #         print(f"PM2.5 (ug/m^3): {pm2_5}")
 #         print(f"PM10 (ug/m^3): {pm10}")
-        print(f"IAQI PM2.5: {IAQ_PM2}")
-        print(f"IAQI PM10: {IAQ_PM10}")
-        print(f"Overall IAQI: {IAQ_ovr}")
+#         print(f"IAQI PM2.5: {IAQ_PM2}")
+#         print(f"IAQI PM10: {IAQ_PM10}")
+#         print(f"Overall IAQI: {IAQ_ovr}")
         new_data = True
         
         # Handle ventilation status
@@ -179,7 +179,6 @@ while connection_status == True:
                 
         # If over/equal to conditions below, "Dangerous" PM condition met (via OSHA 1910.1000)
         if IAQ_ovr >=200:
-            client.publish("ESP32/Relay", payload="ON", qos=0)
             time.sleep(0.5)
             IAQ = "3"
             time.sleep(0.3)
@@ -190,10 +189,9 @@ while connection_status == True:
             subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main_Copy.py', IAQ, sensor_id] ,text=True, timeout=3)
             time.sleep(0.5)
             new_data = False
-            
         # If under "Dangerous" threshold and over/equal to conditions below, "Unhealthy" PM condition met (via OSHA 1910.1000)
         elif IAQ_ovr >=100:
-            #client.publish("cu/pm_status", payload="Unhealthy", qos=0)
+            time.sleep(0.3)
             print("Unhealthy")
             time.sleep(0.3)
             IAQ = "2"
@@ -202,11 +200,8 @@ while connection_status == True:
             subprocess.run(['python','/home/freshair/Documents/Testing_Codes/User_Interface/Testing_Plan_Main_Copy.py', IAQ, sensor_id] ,text=True, timeout=3)
             time.sleep(0.5)
             new_data = False
-            
         # If below both conditions, "Healthy" PM condition met (via OSHA 1910.1000)
         else:
-            time.sleep(0.3)
-            client.publish("ESP32/Relay", "OFF", qos=0)
             time.sleep(0.3)
             IAQ = "1"
             time.sleep(0.3)
@@ -234,9 +229,6 @@ def button_callback(channel):
     
 GPIO.add_event_detect(37,GPIO.RISING,callback=button_callback)
 reset_sensors()
-GPIO.cleanup()
-client.loop_stop()
-sys.exit()
 GPIO.cleanup()
 client.loop_stop()
 sys.exit()
